@@ -66,6 +66,9 @@ export function HandoffWizardPage() {
   const [linkValid, setLinkValid] = useState<boolean | null>(null);
   const [checkingLink, setCheckingLink] = useState(false);
 
+  // Extraction state
+  const [extracting, setExtracting] = useState(false);
+
   // Step 2: Projeto
   const [project, setProject] = useState<ProjectData>({
     companyName: '',
@@ -359,7 +362,39 @@ Gerado em: ${new Date().toLocaleString('pt-BR')}
 
   // ─── Navigation ───────────────────────────────────────────────────────────
 
+  const extractAndPrefill = async () => {
+    setExtracting(true);
+    try {
+      const res = await api.post<{ data: {
+        companyName: string;
+        razaoSocial: string;
+        stakeholders: string[];
+        projectStartDate: string;
+        projectScope: string[];
+      } }>('/handoffs/extract-transcript', { transcript });
+
+      const d = res.data.data;
+      setProject(prev => ({
+        ...prev,
+        companyName: d.companyName || prev.companyName,
+        razaoSocial: d.razaoSocial || prev.razaoSocial,
+        stakeholders: d.stakeholders?.length && d.stakeholders[0] !== '' ? d.stakeholders : prev.stakeholders,
+        projectStartDate: d.projectStartDate || prev.projectStartDate,
+        projectScope: d.projectScope?.length ? d.projectScope : prev.projectScope,
+      }));
+    } catch (err) {
+      console.error('Extraction failed, continuing without pre-fill:', err);
+    } finally {
+      setExtracting(false);
+      setCurrentStep(1);
+    }
+  };
+
   const goNext = () => {
+    if (currentStep === 0) {
+      extractAndPrefill();
+      return;
+    }
     if (currentStep === 2 && !spicedReport) {
       generateSpiced();
       return;
@@ -502,11 +537,13 @@ Gerado em: ${new Date().toLocaleString('pt-BR')}
 
           <GradientButton
             onClick={goNext}
-            disabled={!canProceed && currentStep !== 2}
-            loading={currentStep === 2 && generatingSpiced}
+            disabled={(!canProceed && currentStep !== 2) || extracting}
+            isLoading={(currentStep === 2 && generatingSpiced) || extracting}
             rightIcon={<ChevronRight size={16} />}
           >
-            {currentStep === 2 && !spicedReport
+            {extracting
+              ? 'Analisando transcrição...'
+              : currentStep === 2 && !spicedReport
               ? 'Gerar Análise SPICED'
               : 'Prosseguir'}
           </GradientButton>

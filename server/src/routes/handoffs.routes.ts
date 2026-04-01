@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   createHandoff,
+  extractTranscript,
   getHandoff,
   getMyHandoffs,
   getLeadershipHandoffs,
@@ -19,6 +20,9 @@ import { authorize } from '../middleware/authorize';
 const router = Router();
 
 router.use(authenticate);
+
+// POST /api/handoffs/extract-transcript — AI extraction from transcript
+router.post('/extract-transcript', authorize('aquisicao', 'super_admin'), extractTranscript);
 
 // POST /api/handoffs — create a new draft handoff
 router.post('/', authorize('aquisicao', 'super_admin'), createHandoff);

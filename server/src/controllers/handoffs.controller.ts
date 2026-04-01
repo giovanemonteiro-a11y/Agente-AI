@@ -20,6 +20,20 @@ import {
 import { insertNotification } from '../repositories/notifications.repository';
 import { findUsersByRole } from '../repositories/users.repository';
 import { logger } from '../utils/logger';
+import { extractProjectFromTranscript } from '../services/ai/ai.service';
+
+// ── POST /api/handoffs/extract-transcript ────────────────────────────────────
+
+export const extractTranscript = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+  const { transcript } = req.body;
+  if (!transcript || typeof transcript !== 'string' || transcript.length < 50) {
+    res.status(400).json({ error: 'Transcript must be at least 50 characters' });
+    return;
+  }
+
+  const extracted = await extractProjectFromTranscript(transcript);
+  res.json({ data: extracted });
+});
 
 // ── POST /api/handoffs ───────────────────────────────────────────────────────
 

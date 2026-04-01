@@ -16,6 +16,7 @@ import {
   StrategicSystemType,
   SYSTEM_SCOPE_MAP,
 } from './prompts/strategicSystems.prompt';
+import { TRANSCRIPT_EXTRACTION_PROMPT } from './prompts/extraction.prompt';
 
 // ── Phase 3 domain types ──────────────────────────────────────────────────────
 export interface GapItem {
@@ -1409,4 +1410,67 @@ export async function generateBI(
 
   logger.error('generateBI failed after retries — returning mock data');
   return MOCK_BI_DATA;
+}
+
+// ── Transcript Extraction (Handoff Step 1 → Step 2) ─────────────────────────
+
+export interface TranscriptExtraction {
+  companyName: string;
+  razaoSocial: string;
+  stakeholders: string[];
+  projectStartDate: string;
+  projectScope: string[];
+}
+
+const MOCK_EXTRACTION: TranscriptExtraction = {
+  companyName: '',
+  razaoSocial: '',
+  stakeholders: [''],
+  projectStartDate: '',
+  projectScope: [],
+};
+
+export async function extractProjectFromTranscript(
+  transcript: string,
+): Promise<TranscriptExtraction> {
+  if (!openaiClient) {
+    logger.warn('extractProjectFromTranscript: OpenAI not configured — returning empty');
+    return MOCK_EXTRACTION;
+  }
+
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const response = await openaiClient.chat.completions.create({
+        model: OPENAI_MODELS.GPT4O_MINI,
+        messages: [
+          { role: 'system', content: TRANSCRIPT_EXTRACTION_PROMPT },
+          { role: 'user', content: transcript.slice(0, 12000) },
+        ],
+        response_format: { type: 'json_object' },
+        temperature: 0.2,
+      });
+
+      const content = response.choices[0]?.message?.content;
+      if (!content) throw new Error('Empty response from OpenAI');
+
+      const parsed = JSON.parse(content) as TranscriptExtraction;
+
+      // Ensure stakeholders is never empty array
+      if (!parsed.stakeholders || parsed.stakeholders.length === 0) {
+        parsed.stakeholders = [''];
+      }
+
+      logger.info('extractProjectFromTranscript: success');
+      return parsed;
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      logger.warn(`extractProjectFromTranscript attempt ${attempt + 1} failed: ${msg}`);
+      if (attempt < 1) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+    }
+  }
+
+  logger.error('extractProjectFromTranscript failed after retries');
+  return MOCK_EXTRACTION;
 }
