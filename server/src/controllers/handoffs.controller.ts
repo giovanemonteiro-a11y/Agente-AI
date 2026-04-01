@@ -134,17 +134,20 @@ export const generateSpiced = asyncHandler(async (req: Request, res: Response): 
 
   // Build context-aware SPICED report
   const companyName = handoff.company_name ?? 'Cliente';
-  const stakeholders = handoff.stakeholders ?? [];
+  const rawStakeholders = handoff.stakeholders as Array<{ name: string; role: string }> | string[] | null;
+  const stakeholderNames: string[] = Array.isArray(rawStakeholders)
+    ? rawStakeholders.map((s: unknown) => typeof s === 'string' ? s : (s as { name: string }).name || '')
+    : [];
   const scope = handoff.project_scope;
   const startDate = handoff.project_start_date ?? '';
 
   const spicedReport = {
     executiveSummary: `Resumo executivo da análise de vendas para ${companyName}. Com base na transcrição de venda e dados do projeto, foi realizada uma análise completa utilizando o framework SPICED. O escopo contratado inclui ${Array.isArray(scope) ? scope.join(', ') : 'serviços de marketing digital'}.`,
-    situation: `A empresa ${companyName} (${handoff.razao_social ?? ''}) busca fortalecer sua presença digital. Stakeholder(s): ${stakeholders.join(', ') || 'Não informado'}. Projeto com início em ${startDate}.`,
+    situation: `A empresa ${companyName} (${handoff.razao_social ?? ''}) busca fortalecer sua presença digital. Stakeholder(s): ${stakeholderNames.join(', ') || 'Não informado'}. Projeto com início em ${startDate}.`,
     pain: `Principais desafios identificados na análise da transcrição:\n\n1. Necessidade de presença digital consistente\n2. Dificuldade em converter leads qualificados\n3. Ausência de métricas claras de ROI\n4. Posicionamento frente à concorrência\n5. Comunicação fragmentada entre canais`,
     impact: `Impacto esperado:\n\n• ROI projetado: Aumento de 40-60% em leads qualificados\n• Melhoria na taxa de conversão: +25%\n• Redução de CAC: -30%\n• Fortalecimento de marca em todos os canais`,
     criticalEvent: `Eventos críticos:\n\n• Início do projeto: ${startDate}\n• 30 dias: Setup completo\n• 60 dias: Primeiras campanhas ativas\n• 90 dias: Primeira revisão estratégica`,
-    decision: `Mapa de decisão:\n\n• Decisor(es): ${stakeholders[0] || 'Stakeholder principal'}\n• Critérios: Resultados mensuráveis, transparência, qualidade\n• Budget aprovado para escopo contratado`,
+    decision: `Mapa de decisão:\n\n• Decisor(es): ${stakeholderNames[0] || 'Stakeholder principal'}\n• Critérios: Resultados mensuráveis, transparência, qualidade\n• Budget aprovado para escopo contratado`,
     contractedScope: `Escopo contratado:\n${Array.isArray(scope) ? scope.map((s: unknown, i: number) => `${i + 1}. ${s}`).join('\n') : 'Conforme contrato'}\n\nInício: ${startDate}\nEmpresa: ${companyName}`,
   };
 
