@@ -26,4 +26,3 @@ Sua tarefa é extrair dados estruturados da transcrição fornecida. Analise o t
 - O JSON deve ser válido e conter exatamente os 5 campos acima.
 
 Responda SOMENTE com o JSON, sem texto adicional.`;
-`;
