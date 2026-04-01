@@ -14,7 +14,7 @@ import { query } from '../config/database';
 // ─── Accounts ─────────────────────────────────────────────────────────────────
 
 export async function listAccountUsers(): Promise<{ id: string; name: string; email: string }[]> {
-  const result = await query(
+  const result = await query<{ id: string; name: string; email: string }>(
     `SELECT id, name, email FROM users WHERE role = 'account' ORDER BY name`,
   );
   return result.rows;
