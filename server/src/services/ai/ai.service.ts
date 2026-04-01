@@ -1,4 +1,7 @@
-import { openaiClient, OPENAI_MODELS } from '../../config/openai';
+import { getOpenAIClient, OPENAI_MODELS } from '../../config/openai';
+
+// Lazy accessor — resolves on first use so env vars are available at runtime
+const openaiClient = { get client() { return getOpenAIClient(); } };
 import { ZodSchema, z } from 'zod';
 import { logger } from '../../utils/logger';
 import { Response } from 'express';
@@ -118,8 +121,8 @@ export async function generateWithRetry<T>(
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      if (!openaiClient) throw new Error('OpenAI client not configured');
-      const response = await openaiClient.chat.completions.create({
+      if (!openaiClient.client) throw new Error('OpenAI client not configured');
+      const response = await openaiClient.client!.chat.completions.create({
         model,
         messages: [
           { role: 'system', content: systemPrompt },
@@ -156,7 +159,7 @@ export async function generateStream(
   model: string = OPENAI_MODELS.GPT4O
 ): Promise<AsyncIterable<string>> {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const stream = await openaiClient!.chat.completions.create({
+  const stream = await openaiClient.client!.chat.completions.create({
     model,
     messages: [
       { role: 'system', content: systemPrompt },
@@ -252,7 +255,7 @@ const MOCK_BRAND_PROFILE: BrandProfileJSON = {
 export async function generateSummary(
   context: PromptContext
 ): Promise<{ summary: SummaryJSON; brand_profile: BrandProfileJSON }> {
-  if (!openaiClient) {
+  if (!openaiClient.client) {
     logger.warn('OpenAI not configured — returning mock summary data');
     return { summary: MOCK_SUMMARY, brand_profile: MOCK_BRAND_PROFILE };
   }
@@ -262,7 +265,7 @@ export async function generateSummary(
 
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
-      const response = await openaiClient.chat.completions.create({
+      const response = await openaiClient.client!.chat.completions.create({
         model: OPENAI_MODELS.GPT4O,
         messages: [
           { role: 'system', content: SUMMARY_PROMPT },
@@ -305,7 +308,7 @@ export async function detectGaps(
   context: PromptContext,
   strategyFields: Record<string, string>
 ): Promise<GapItem[]> {
-  if (!openaiClient) {
+  if (!openaiClient.client) {
     logger.warn('OpenAI not configured — returning mock gaps');
     return MOCK_GAPS;
   }
@@ -318,7 +321,7 @@ export async function detectGaps(
   const userPrompt = `${contextText}\n\n## Strategy Fields\n${fieldsText}`;
 
   try {
-    const response = await openaiClient.chat.completions.create({
+    const response = await openaiClient.client!.chat.completions.create({
       model: OPENAI_MODELS.GPT4O_MINI,
       messages: [
         { role: 'system', content: GAP_DETECTION_PROMPT },
@@ -364,7 +367,7 @@ export async function getTranscriptHighlights(
   context: PromptContext,
   fieldName: string
 ): Promise<HighlightItem[]> {
-  if (!openaiClient) {
+  if (!openaiClient.client) {
     logger.warn('OpenAI not configured — returning mock highlights');
     return MOCK_HIGHLIGHTS;
   }
@@ -381,7 +384,7 @@ export async function getTranscriptHighlights(
   const userPrompt = `Field: ${fieldName}\n\nClient: ${context.clientName}\n\n${transcriptText}`;
 
   try {
-    const response = await openaiClient.chat.completions.create({
+    const response = await openaiClient.client!.chat.completions.create({
       model: OPENAI_MODELS.GPT4O_MINI,
       messages: [
         { role: 'system', content: TRANSCRIPT_HIGHLIGHT_PROMPT },
@@ -411,7 +414,7 @@ export async function streamTranscriptHighlights(
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
 
-  if (!openaiClient) {
+  if (!openaiClient.client) {
     logger.warn('OpenAI not configured — streaming mock highlights');
     const mock = JSON.stringify(MOCK_HIGHLIGHTS);
     res.write(`data: ${JSON.stringify({ text: mock })}\n\n`);
@@ -429,7 +432,7 @@ export async function streamTranscriptHighlights(
   const userPrompt = `Field: ${fieldName}\n\nClient: ${context.clientName}\n\n${transcriptText}`;
 
   try {
-    const stream = await openaiClient.chat.completions.create({
+    const stream = await openaiClient.client!.chat.completions.create({
       model: OPENAI_MODELS.GPT4O_MINI,
       messages: [
         { role: 'system', content: TRANSCRIPT_HIGHLIGHT_PROMPT },
@@ -659,7 +662,7 @@ const MOCK_EMPATHY_MAP: EmpathyMapData = {
 // ── generateCohorts ───────────────────────────────────────────────────────────
 
 export async function generateCohorts(context: PromptContext): Promise<CohortData[]> {
-  if (!openaiClient) {
+  if (!openaiClient.client) {
     logger.warn('OpenAI not configured — returning mock cohort data');
     return MOCK_COHORTS;
   }
@@ -669,7 +672,7 @@ export async function generateCohorts(context: PromptContext): Promise<CohortDat
 
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      const response = await openaiClient.chat.completions.create({
+      const response = await openaiClient.client!.chat.completions.create({
         model: OPENAI_MODELS.GPT4O,
         messages: [
           { role: 'system', content: COHORTS_SYSTEM_PROMPT },
@@ -706,7 +709,7 @@ export async function generateCohorts(context: PromptContext): Promise<CohortDat
 // ── generateEmpathyMap ────────────────────────────────────────────────────────
 
 export async function generateEmpathyMap(cohort: CohortData): Promise<EmpathyMapData> {
-  if (!openaiClient) {
+  if (!openaiClient.client) {
     logger.warn('OpenAI not configured — returning mock empathy map');
     return MOCK_EMPATHY_MAP;
   }
@@ -723,7 +726,7 @@ export async function generateEmpathyMap(cohort: CohortData): Promise<EmpathyMap
 
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
-      const response = await openaiClient.chat.completions.create({
+      const response = await openaiClient.client!.chat.completions.create({
         model: OPENAI_MODELS.GPT4O,
         messages: [
           { role: 'system', content: EMPATHY_MAP_SYSTEM_PROMPT },
@@ -1087,7 +1090,7 @@ export async function generateStrategicSystem(
   type: StrategicSystemType,
   cohorts?: CohortData[]
 ): Promise<unknown> {
-  if (!openaiClient) {
+  if (!openaiClient.client) {
     logger.warn(`OpenAI not configured — returning mock data for strategic system: ${type}`);
     return getMockStrategicSystem(type);
   }
@@ -1096,7 +1099,7 @@ export async function generateStrategicSystem(
 
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      const response = await openaiClient.chat.completions.create({
+      const response = await openaiClient.client!.chat.completions.create({
         model: OPENAI_MODELS.GPT4O,
         messages: [
           { role: 'system', content: systemPrompt },
@@ -1271,7 +1274,7 @@ export async function generateBriefing(
   type: BriefingType,
   designerScope?: string
 ): Promise<unknown> {
-  if (!openaiClient) {
+  if (!openaiClient.client) {
     logger.warn(`OpenAI not configured — returning mock ${type} briefing`);
     return getMockBriefing(type);
   }
@@ -1292,7 +1295,7 @@ export async function generateBriefing(
 
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      const response = await openaiClient.chat.completions.create({
+      const response = await openaiClient.client!.chat.completions.create({
         model: OPENAI_MODELS.GPT4O,
         messages: [
           { role: 'system', content: systemPrompt },
@@ -1373,7 +1376,7 @@ export async function generateBI(
   context: PromptContext,
   biType: 'individual' | 'global' = 'individual'
 ): Promise<BIData> {
-  if (!openaiClient) {
+  if (!openaiClient.client) {
     logger.warn('generateBI: OpenAI not configured — returning mock BI data');
     return MOCK_BI_DATA;
   }
@@ -1383,7 +1386,7 @@ export async function generateBI(
 
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
-      const response = await openaiClient.chat.completions.create({
+      const response = await openaiClient.client!.chat.completions.create({
         model: OPENAI_MODELS.GPT4O,
         messages: [
           { role: 'system', content: BI_PROMPT },
@@ -1438,14 +1441,14 @@ const MOCK_EXTRACTION: TranscriptExtraction = {
 export async function extractProjectFromTranscript(
   transcript: string,
 ): Promise<TranscriptExtraction> {
-  if (!openaiClient) {
+  if (!openaiClient.client) {
     logger.warn('extractProjectFromTranscript: OpenAI not configured — returning empty');
     return MOCK_EXTRACTION;
   }
 
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
-      const response = await openaiClient.chat.completions.create({
+      const response = await openaiClient.client!.chat.completions.create({
         model: OPENAI_MODELS.GPT4O_MINI,
         messages: [
           { role: 'system', content: TRANSCRIPT_EXTRACTION_PROMPT },

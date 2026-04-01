@@ -10,17 +10,22 @@ export type OpenAIModel = (typeof OPENAI_MODELS)[keyof typeof OPENAI_MODELS];
 
 /**
  * Returns a configured OpenAI client, or null if OPENAI_API_KEY is not set.
- * Callers must handle the null case (e.g., use a mock response).
+ * Lazy-cached: first call creates the client, subsequent calls reuse it.
  */
+let _cachedClient: OpenAI | null | undefined;
+
 export function getOpenAIClient(): OpenAI | null {
+  if (_cachedClient !== undefined) return _cachedClient;
   if (!process.env.OPENAI_API_KEY) {
+    _cachedClient = null;
     return null;
   }
-  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  _cachedClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  return _cachedClient;
 }
 
 /**
- * Cached singleton — use this everywhere except in tests.
- * May be null when OPENAI_API_KEY is absent.
+ * @deprecated Use getOpenAIClient() instead for lazy initialization.
+ * Kept for backwards compatibility — delegates to getOpenAIClient().
  */
-export const openaiClient: OpenAI | null = getOpenAIClient();
+export const openaiClient: OpenAI | null = null;

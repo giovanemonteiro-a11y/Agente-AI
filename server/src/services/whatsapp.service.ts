@@ -1,4 +1,4 @@
-import { openaiClient, OPENAI_MODELS } from '../config/openai';
+import { getOpenAIClient, OPENAI_MODELS } from '../config/openai';
 import { logger } from '../utils/logger';
 import * as whatsappRepo from '../repositories/whatsapp.repository';
 
@@ -131,13 +131,13 @@ Regras:
 
   let demands: ExtractedDemand[] = [];
 
-  if (!openaiClient) {
+  if (!getOpenAIClient()) {
     logger.warn('extractDemands: OpenAI not configured — returning empty demands');
     return [];
   }
 
   try {
-    const response = await openaiClient.chat.completions.create({
+    const response = await getOpenAIClient()!.chat.completions.create({
       model: OPENAI_MODELS.GPT4O,
       messages: [
         { role: 'system', content: systemPrompt },
