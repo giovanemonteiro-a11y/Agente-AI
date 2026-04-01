@@ -386,17 +386,19 @@ Gerado em: ${new Date().toLocaleString('pt-BR')}
       } }>('/handoffs/extract-transcript', { transcript });
 
       const d = res.data.data;
-      const mappedStakeholders: Stakeholder[] = d.stakeholders?.length && d.stakeholders[0]?.name !== ''
-        ? d.stakeholders.map(s => ({ name: s.name || '', role: s.role === 'influenciador' ? 'influenciador' : 'decisor' }))
-        : prev.stakeholders;
-      setProject(prev => ({
-        ...prev,
-        companyName: d.companyName || prev.companyName,
-        razaoSocial: d.razaoSocial || prev.razaoSocial,
-        stakeholders: mappedStakeholders,
-        projectStartDate: d.projectStartDate || prev.projectStartDate,
-        projectScope: d.projectScope?.length ? d.projectScope : prev.projectScope,
-      }));
+      setProject(prev => {
+        const mappedStakeholders: Stakeholder[] = d.stakeholders?.length && d.stakeholders[0]?.name !== ''
+          ? d.stakeholders.map(s => ({ name: s.name || '', role: s.role === 'influenciador' ? 'influenciador' : 'decisor' }))
+          : prev.stakeholders;
+        return {
+          ...prev,
+          companyName: d.companyName || prev.companyName,
+          razaoSocial: d.razaoSocial || prev.razaoSocial,
+          stakeholders: mappedStakeholders,
+          projectStartDate: d.projectStartDate || prev.projectStartDate,
+          projectScope: d.projectScope?.length ? d.projectScope : prev.projectScope,
+        };
+      });
     } catch (err) {
       console.error('Extraction failed, continuing without pre-fill:', err);
     } finally {
