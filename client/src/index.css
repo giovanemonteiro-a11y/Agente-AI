@@ -1,0 +1,256 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ================================================
+   Galaxy Future Design System — CSS Variables
+   ================================================ */
+:root {
+  /* Core Palette */
+  --color-blue: #1A56DB;
+  --color-blue-light: #3B76F6;
+  --color-blue-dark: #1040B0;
+  --color-pink: #E040FB;
+  --color-pink-light: #F06FFF;
+  --color-pink-dark: #B020D0;
+  --color-purple: #7C3AED;
+  --color-cyan: #06B6D4;
+
+  /* Backgrounds */
+  --bg-deep: #0A0A14;
+  --bg-dark: #0E0E1C;
+  --bg-card: rgba(255, 255, 255, 0.04);
+  --bg-card-hover: rgba(255, 255, 255, 0.08);
+
+  /* Glass surfaces */
+  --glass-border: rgba(255, 255, 255, 0.10);
+  --glass-border-strong: rgba(255, 255, 255, 0.18);
+  --glass-surface: rgba(255, 255, 255, 0.06);
+  --glass-surface-strong: rgba(255, 255, 255, 0.10);
+
+  /* Text */
+  --text-primary: #F0F0FF;
+  --text-secondary: #A0A0C0;
+  --text-muted: #606080;
+
+  /* Glows */
+  --glow-blue: 0 0 20px rgba(26, 86, 219, 0.5), 0 0 60px rgba(26, 86, 219, 0.2);
+  --glow-pink: 0 0 20px rgba(224, 64, 251, 0.5), 0 0 60px rgba(224, 64, 251, 0.2);
+  --glow-blue-sm: 0 0 10px rgba(26, 86, 219, 0.4);
+  --glow-pink-sm: 0 0 10px rgba(224, 64, 251, 0.4);
+}
+
+/* ================================================
+   Base Reset
+   ================================================ */
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--bg-deep);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  #root {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  /* Focus ring */
+  :focus-visible {
+    outline: 2px solid var(--color-blue);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Selection */
+  ::selection {
+    background: rgba(26, 86, 219, 0.35);
+    color: #fff;
+  }
+}
+
+/* ================================================
+   Component Utilities
+   ================================================ */
+@layer components {
+  /* Glass Card */
+  .glass-card {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: var(--glass-surface);
+    border: 1px solid var(--glass-border);
+    border-radius: 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  .glass-card-strong {
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    background: var(--glass-surface-strong);
+    border: 1px solid var(--glass-border-strong);
+    border-radius: 1rem;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  }
+
+  /* Gradient Text */
+  .gradient-text {
+    background: linear-gradient(90deg, var(--color-blue-light) 0%, var(--color-pink) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-text-blue {
+    background: linear-gradient(90deg, #3B76F6 0%, #7C3AED 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Glow effects */
+  .glow-blue {
+    box-shadow: var(--glow-blue);
+  }
+
+  .glow-pink {
+    box-shadow: var(--glow-pink);
+  }
+
+  .glow-blue-text {
+    text-shadow: 0 0 20px rgba(26, 86, 219, 0.8), 0 0 40px rgba(26, 86, 219, 0.4);
+  }
+
+  .glow-pink-text {
+    text-shadow: 0 0 20px rgba(224, 64, 251, 0.8), 0 0 40px rgba(224, 64, 251, 0.4);
+  }
+
+  /* Gradient Button */
+  .btn-gradient {
+    background: linear-gradient(90deg, var(--color-blue) 0%, var(--color-purple) 50%, var(--color-pink) 100%);
+    background-size: 200% 100%;
+    transition: background-position 0.3s ease, box-shadow 0.3s ease, transform 0.15s ease;
+    border: none;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .btn-gradient:hover {
+    background-position: 100% 0;
+    box-shadow: 0 0 24px rgba(26, 86, 219, 0.5), 0 0 48px rgba(224, 64, 251, 0.25);
+    transform: translateY(-1px);
+  }
+
+  .btn-gradient:active {
+    transform: translateY(0);
+  }
+
+  /* Nav item active */
+  .nav-item-active {
+    background: linear-gradient(90deg, rgba(26, 86, 219, 0.2) 0%, rgba(26, 86, 219, 0.05) 100%);
+    border-left: 2px solid var(--color-blue);
+    color: var(--color-blue-light);
+  }
+
+  /* Glass Input */
+  .glass-input {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--glass-border);
+    border-radius: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+
+  .glass-input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .glass-input:focus {
+    outline: none;
+    border-color: rgba(59, 118, 246, 0.5);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .glass-input option {
+    background-color: #12122a;
+    color: var(--text-primary);
+  }
+
+  /* Gradient Button */
+  .gradient-button {
+    background: linear-gradient(90deg, var(--color-blue) 0%, var(--color-purple) 50%, var(--color-pink) 100%);
+    background-size: 200% 100%;
+    border: none;
+    border-radius: 0.75rem;
+    color: #ffffff;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    transition: background-position 0.3s ease, box-shadow 0.3s ease, transform 0.15s ease;
+  }
+
+  .gradient-button:hover {
+    background-position: 100% 0;
+    box-shadow: 0 0 20px rgba(26, 86, 219, 0.5), 0 0 40px rgba(224, 64, 251, 0.2);
+    transform: translateY(-1px);
+  }
+
+  .gradient-button:active {
+    transform: translateY(0);
+  }
+
+  .gradient-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Shimmer loading */
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.03) 0%,
+      rgba(255, 255, 255, 0.08) 50%,
+      rgba(255, 255, 255, 0.03) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s linear infinite;
+  }
+}

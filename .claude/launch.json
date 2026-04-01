@@ -1,0 +1,31 @@
+{
+  "version": "0.0.1",
+  "autoPort": false,
+  "configurations": [
+    {
+      "name": "Client (Vite React — port 5173)",
+      "runtimeExecutable": "C:/Program Files/nodejs/node.exe",
+      "runtimeArgs": ["node_modules/vite/bin/vite.js", "--config", "client/vite.config.ts"],
+      "port": 5173
+    },
+    {
+      "name": "Server (Express API — port 3001)",
+      "runtimeExecutable": "C:/Program Files/nodejs/node.exe",
+      "runtimeArgs": [
+        "node_modules/ts-node-dev/lib/bin.js",
+        "--respawn",
+        "--transpile-only",
+        "--project",
+        "server/tsconfig.json",
+        "server/src/index.ts"
+      ],
+      "port": 3001
+    },
+    {
+      "name": "Full Stack (Client + Server)",
+      "runtimeExecutable": "C:/Program Files/nodejs/node.exe",
+      "runtimeArgs": ["node_modules/vite/bin/vite.js", "--config", "client/vite.config.ts"],
+      "port": 5173
+    }
+  ]
+}
