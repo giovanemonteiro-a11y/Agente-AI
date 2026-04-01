@@ -1,9 +1,9 @@
 import OpenAI from 'openai';
 
 export const OPENAI_MODELS = {
-  GPT4O: 'gpt-4o',
-  GPT4O_MINI: 'gpt-4o-mini',
-  WHISPER: 'whisper-1',
+  GPT4O: 'llama-3.3-70b-versatile',
+  GPT4O_MINI: 'llama-3.1-8b-instant',
+  WHISPER: 'whisper-large-v3',
 } as const;
 
 export type OpenAIModel = (typeof OPENAI_MODELS)[keyof typeof OPENAI_MODELS];
@@ -16,12 +16,26 @@ let _cachedClient: OpenAI | null | undefined;
 
 export function getOpenAIClient(): OpenAI | null {
   if (_cachedClient !== undefined) return _cachedClient;
-  if (!process.env.OPENAI_API_KEY) {
-    _cachedClient = null;
-    return null;
+
+  // Support Groq (GROQ_API_KEY) or OpenAI (OPENAI_API_KEY)
+  const groqKey = process.env.GROQ_API_KEY;
+  const openaiKey = process.env.OPENAI_API_KEY;
+
+  if (groqKey) {
+    _cachedClient = new OpenAI({
+      apiKey: groqKey,
+      baseURL: 'https://api.groq.com/openai/v1',
+    });
+    return _cachedClient;
   }
-  _cachedClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-  return _cachedClient;
+
+  if (openaiKey) {
+    _cachedClient = new OpenAI({ apiKey: openaiKey });
+    return _cachedClient;
+  }
+
+  _cachedClient = null;
+  return null;
 }
 
 /**
