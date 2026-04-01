@@ -9,7 +9,7 @@ export interface HandoffRow {
   // Step 2
   company_name: string | null;
   razao_social: string | null;
-  stakeholders: string[];
+  stakeholders: unknown;
   project_start_date: string | null;
   project_scope: Record<string, unknown> | null;
   contract_url: string | null;
@@ -114,7 +114,7 @@ export async function updateStep2(
   data: {
     company_name: string;
     razao_social: string;
-    stakeholders: string[];
+    stakeholders: unknown;
     project_start_date: string;
     project_scope: unknown;
     contract_url: string;
@@ -123,13 +123,13 @@ export async function updateStep2(
 ): Promise<HandoffRow | null> {
   const result = await query<HandoffRow>(
     `UPDATE handoffs
-     SET company_name = $1, razao_social = $2, stakeholders = $3,
+     SET company_name = $1, razao_social = $2, stakeholders = $3::jsonb,
          project_start_date = $4, project_scope = $5, contract_url = $6,
          whatsapp_group_id = $7, current_step = GREATEST(current_step, 2), updated_at = NOW()
      WHERE id = $8 RETURNING *`,
     [
       data.company_name, data.razao_social,
-      data.stakeholders, data.project_start_date,
+      JSON.stringify(data.stakeholders), data.project_start_date,
       JSON.stringify(data.project_scope), data.contract_url,
       data.whatsapp_group_id, id,
     ]

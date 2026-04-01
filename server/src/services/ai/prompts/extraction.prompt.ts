@@ -6,7 +6,10 @@ Sua tarefa é extrair dados estruturados da transcrição fornecida. Analise o t
 
 - **companyName**: Nome fantasia / marca da empresa do cliente. Se não encontrar, retorne string vazia.
 - **razaoSocial**: Razão social da empresa. Se não encontrar, retorne string vazia.
-- **stakeholders**: Array com os nomes das pessoas mencionadas como decisores, sócios, diretores ou contatos principais do cliente. Não inclua nomes da equipe da agência. Se não encontrar, retorne array com string vazia [""].
+- **stakeholders**: Array de objetos com as pessoas do CLIENTE mencionadas na conversa. Cada objeto deve ter:
+  - "name": nome da pessoa
+  - "role": papel da pessoa — use "decisor" para quem toma a decisão final (sócio, dono, diretor, CEO) ou "influenciador" para quem participa mas não decide sozinho (gerente, coordenador, assistente)
+  Não inclua nomes da equipe da agência/vendedor. Se não encontrar nenhum stakeholder, retorne [{"name": "", "role": "decisor"}].
 - **projectStartDate**: Data prevista de início do projeto no formato YYYY-MM-DD. Se não encontrar, retorne string vazia.
 - **projectScope**: Array com os serviços mencionados na conversa. Use APENAS os valores desta lista:
   - "Social Media"
@@ -24,5 +27,6 @@ Sua tarefa é extrair dados estruturados da transcrição fornecida. Analise o t
 - Extraia APENAS informações explicitamente mencionadas na transcrição.
 - Não invente dados. Se algo não estiver claro, retorne o campo vazio.
 - O JSON deve ser válido e conter exatamente os 5 campos acima.
+- stakeholders deve ser um array de objetos {name, role}, nunca um array de strings.
 
 Responda SOMENTE com o JSON, sem texto adicional.`;

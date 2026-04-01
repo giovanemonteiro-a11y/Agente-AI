@@ -1414,10 +1414,15 @@ export async function generateBI(
 
 // ── Transcript Extraction (Handoff Step 1 → Step 2) ─────────────────────────
 
+export interface StakeholderExtraction {
+  name: string;
+  role: 'decisor' | 'influenciador';
+}
+
 export interface TranscriptExtraction {
   companyName: string;
   razaoSocial: string;
-  stakeholders: string[];
+  stakeholders: StakeholderExtraction[];
   projectStartDate: string;
   projectScope: string[];
 }
@@ -1425,7 +1430,7 @@ export interface TranscriptExtraction {
 const MOCK_EXTRACTION: TranscriptExtraction = {
   companyName: '',
   razaoSocial: '',
-  stakeholders: [''],
+  stakeholders: [{ name: '', role: 'decisor' }],
   projectStartDate: '',
   projectScope: [],
 };
@@ -1455,9 +1460,16 @@ export async function extractProjectFromTranscript(
 
       const parsed = JSON.parse(content) as TranscriptExtraction;
 
-      // Ensure stakeholders is never empty array
+      // Ensure stakeholders is never empty array and has correct shape
       if (!parsed.stakeholders || parsed.stakeholders.length === 0) {
-        parsed.stakeholders = [''];
+        parsed.stakeholders = [{ name: '', role: 'decisor' }];
+      } else {
+        // Normalize: if AI returned strings instead of objects, convert
+        parsed.stakeholders = parsed.stakeholders.map((s: unknown) => {
+          if (typeof s === 'string') return { name: s, role: 'decisor' as const };
+          const obj = s as StakeholderExtraction;
+          return { name: obj.name || '', role: obj.role === 'influenciador' ? 'influenciador' : 'decisor' };
+        });
       }
 
       logger.info('extractProjectFromTranscript: success');

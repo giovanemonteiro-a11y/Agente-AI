@@ -20,10 +20,15 @@ interface StepConfig {
   icon: React.ReactNode;
 }
 
+interface Stakeholder {
+  name: string;
+  role: 'decisor' | 'influenciador';
+}
+
 interface ProjectData {
   companyName: string;
   razaoSocial: string;
-  stakeholders: string[];
+  stakeholders: Stakeholder[];
   projectStartDate: string;
   projectScope: string[];
   contractUrl: string;
@@ -73,7 +78,7 @@ export function HandoffWizardPage() {
   const [project, setProject] = useState<ProjectData>({
     companyName: '',
     razaoSocial: '',
-    stakeholders: [''],
+    stakeholders: [{ name: '', role: 'decisor' }],
     projectStartDate: '',
     projectScope: [],
     contractUrl: '',
@@ -128,7 +133,7 @@ export function HandoffWizardPage() {
   // ─── Step 2: Project validation ───────────────────────────────────────────
 
   const addStakeholder = () => {
-    setProject(p => ({ ...p, stakeholders: [...p.stakeholders, ''] }));
+    setProject(p => ({ ...p, stakeholders: [...p.stakeholders, { name: '', role: 'decisor' }] }));
   };
 
   const removeStakeholder = (index: number) => {
@@ -139,10 +144,17 @@ export function HandoffWizardPage() {
     }));
   };
 
-  const updateStakeholder = (index: number, value: string) => {
+  const updateStakeholderName = (index: number, value: string) => {
     setProject(p => ({
       ...p,
-      stakeholders: p.stakeholders.map((s, i) => i === index ? value : s),
+      stakeholders: p.stakeholders.map((s, i) => i === index ? { ...s, name: value } : s),
+    }));
+  };
+
+  const updateStakeholderRole = (index: number, role: 'decisor' | 'influenciador') => {
+    setProject(p => ({
+      ...p,
+      stakeholders: p.stakeholders.map((s, i) => i === index ? { ...s, role } : s),
     }));
   };
 
@@ -167,7 +179,7 @@ export function HandoffWizardPage() {
   const canProceedStep2 =
     project.companyName.trim() !== '' &&
     project.razaoSocial.trim() !== '' &&
-    project.stakeholders.every(s => s.trim() !== '') &&
+    project.stakeholders.every(s => s.name.trim() !== '') &&
     project.projectStartDate !== '' &&
     project.projectScope.length > 0 &&
     project.contractUrl.trim() !== '' &&
@@ -210,11 +222,11 @@ export function HandoffWizardPage() {
       // Fallback: generate locally
       setSpicedReport({
         executiveSummary: `Resumo executivo da análise de vendas para ${project.companyName}. Com base na transcrição de venda e dados do projeto, foi realizada uma análise completa utilizando o framework SPICED, identificando oportunidades estratégicas e pontos de atenção para o projeto que se inicia em ${project.projectStartDate}. O escopo contratado inclui ${project.projectScope.join(', ')}.`,
-        situation: `A empresa ${project.companyName} (${project.razaoSocial}) atua no mercado e busca fortalecer sua presença digital. O stakeholder principal é ${project.stakeholders[0]}. O projeto contempla os serviços de ${project.projectScope.join(', ')}, com início previsto para ${project.projectStartDate}. A empresa demonstra maturidade para investir em estratégias de marketing digital integradas.`,
+        situation: `A empresa ${project.companyName} (${project.razaoSocial}) atua no mercado e busca fortalecer sua presença digital. O stakeholder principal é ${project.stakeholders[0]?.name || 'N/A'}. O projeto contempla os serviços de ${project.projectScope.join(', ')}, com início previsto para ${project.projectStartDate}. A empresa demonstra maturidade para investir em estratégias de marketing digital integradas.`,
         pain: `Principais desafios identificados na análise da transcrição:\n\n1. Falta de presença digital consistente e estratégica\n2. Dificuldade em converter leads qualificados\n3. Ausência de métricas claras de ROI sobre investimentos em marketing\n4. Necessidade de posicionamento mais forte frente à concorrência\n5. Comunicação fragmentada entre canais digitais`,
         impact: `Impacto esperado da solução proposta:\n\n• ROI projetado: Aumento de 40-60% em leads qualificados nos primeiros 6 meses\n• Melhoria na taxa de conversão: Expectativa de crescimento de 25% com otimização dos funis\n• Redução de CAC: Diminuição esperada de 30% com estratégias mais assertivas\n• Fortalecimento de marca: Posicionamento consistente em todos os canais contratados\n• A não implementação pode resultar em perda progressiva de market share e aumento do CAC`,
         criticalEvent: `Eventos críticos e prazos identificados:\n\n• Data de início do projeto: ${project.projectStartDate}\n• Primeiros 30 dias: Setup de todas as plataformas e ferramentas\n• 60 dias: Primeiras campanhas ativas e métricas iniciais\n• 90 dias: Primeira revisão estratégica com análise de resultados\n• Prazo contratual: Revisão do escopo a cada 6 meses`,
-        decision: `Mapa de decisão do cliente:\n\n• Decisor principal: ${project.stakeholders[0]}\n${project.stakeholders.length > 1 ? `• Influenciadores: ${project.stakeholders.slice(1).join(', ')}\n` : ''}• Critérios de avaliação: Resultados mensuráveis, transparência nos reports, qualidade do atendimento\n• Processo de aprovação: Validação mensal de resultados pelo stakeholder\n• Budget aprovado para: ${project.projectScope.join(', ')}`,
+        decision: `Mapa de decisão do cliente:\n\n• Decisor principal: ${project.stakeholders.find(s => s.role === 'decisor')?.name || project.stakeholders[0]?.name || 'N/A'}\n${project.stakeholders.filter(s => s.role === 'influenciador').length > 0 ? `• Influenciadores: ${project.stakeholders.filter(s => s.role === 'influenciador').map(s => s.name).join(', ')}\n` : ''}• Critérios de avaliação: Resultados mensuráveis, transparência nos reports, qualidade do atendimento\n• Processo de aprovação: Validação mensal de resultados pelo stakeholder\n• Budget aprovado para: ${project.projectScope.join(', ')}`,
         contractedScope: `Escopo contratado resumido:\n\n${project.projectScope.map((s, i) => `${i + 1}. ${s}`).join('\n')}\n\nInício do projeto: ${project.projectStartDate}\nEmpresa: ${project.companyName}\nRazão Social: ${project.razaoSocial}`,
       });
     } finally {
@@ -299,7 +311,7 @@ GRAVAÇÃO: ${recordingUrl}
 FICHA DO PROJETO
 Empresa: ${project.companyName}
 Razão Social: ${project.razaoSocial}
-Stakeholders: ${project.stakeholders.join(', ')}
+Stakeholders: ${project.stakeholders.map(s => `${s.name} (${s.role})`).join(', ')}
 Data de Início: ${project.projectStartDate}
 Escopo: ${project.projectScope.join(', ')}
 Contrato: ${project.contractUrl}
@@ -344,7 +356,7 @@ Gerado em: ${new Date().toLocaleString('pt-BR')}
     setProject({
       companyName: '',
       razaoSocial: '',
-      stakeholders: [''],
+      stakeholders: [{ name: '', role: 'decisor' as const }],
       projectStartDate: '',
       projectScope: [],
       contractUrl: '',
@@ -368,17 +380,20 @@ Gerado em: ${new Date().toLocaleString('pt-BR')}
       const res = await api.post<{ data: {
         companyName: string;
         razaoSocial: string;
-        stakeholders: string[];
+        stakeholders: { name: string; role: 'decisor' | 'influenciador' }[];
         projectStartDate: string;
         projectScope: string[];
       } }>('/handoffs/extract-transcript', { transcript });
 
       const d = res.data.data;
+      const mappedStakeholders: Stakeholder[] = d.stakeholders?.length && d.stakeholders[0]?.name !== ''
+        ? d.stakeholders.map(s => ({ name: s.name || '', role: s.role === 'influenciador' ? 'influenciador' : 'decisor' }))
+        : prev.stakeholders;
       setProject(prev => ({
         ...prev,
         companyName: d.companyName || prev.companyName,
         razaoSocial: d.razaoSocial || prev.razaoSocial,
-        stakeholders: d.stakeholders?.length && d.stakeholders[0] !== '' ? d.stakeholders : prev.stakeholders,
+        stakeholders: mappedStakeholders,
         projectStartDate: d.projectStartDate || prev.projectStartDate,
         projectScope: d.projectScope?.length ? d.projectScope : prev.projectScope,
       }));
@@ -484,7 +499,8 @@ Gerado em: ${new Date().toLocaleString('pt-BR')}
               connectWhatsapp={connectWhatsapp}
               addStakeholder={addStakeholder}
               removeStakeholder={removeStakeholder}
-              updateStakeholder={updateStakeholder}
+              updateStakeholderName={updateStakeholderName}
+              updateStakeholderRole={updateStakeholderRole}
               toggleScope={toggleScope}
             />
           )}
@@ -670,7 +686,7 @@ function Step1Transcricao({
 function Step2Projeto({
   project, setProject,
   whatsappConnected, connectingWhatsapp, connectWhatsapp,
-  addStakeholder, removeStakeholder, updateStakeholder,
+  addStakeholder, removeStakeholder, updateStakeholderName, updateStakeholderRole,
   toggleScope,
 }: {
   project: ProjectData;
@@ -680,7 +696,8 @@ function Step2Projeto({
   connectWhatsapp: () => void;
   addStakeholder: () => void;
   removeStakeholder: (i: number) => void;
-  updateStakeholder: (i: number, v: string) => void;
+  updateStakeholderName: (i: number, v: string) => void;
+  updateStakeholderRole: (i: number, role: 'decisor' | 'influenciador') => void;
   toggleScope: (s: string) => void;
 }) {
   const inputCls = 'w-full bg-white/[0.03] border border-glass-border rounded-xl px-4 py-3 text-sm text-text-primary placeholder:text-text-muted/50 focus:outline-none focus:border-galaxy-blue/40 focus:shadow-glow-blue-sm transition-all';
@@ -751,11 +768,19 @@ function Step2Projeto({
             <div key={i} className="flex items-center gap-2">
               <span className="text-2xs text-text-muted w-5 text-center flex-shrink-0">{i + 1}</span>
               <input
-                value={s}
-                onChange={e => updateStakeholder(i, e.target.value)}
+                value={s.name}
+                onChange={e => updateStakeholderName(i, e.target.value)}
                 placeholder={`Nome do Stakeholder ${i + 1}`}
                 className="flex-1 bg-white/[0.03] border border-glass-border rounded-xl px-4 py-2.5 text-sm text-text-primary placeholder:text-text-muted/50 focus:outline-none focus:border-galaxy-blue/40 transition-all"
               />
+              <select
+                value={s.role}
+                onChange={e => updateStakeholderRole(i, e.target.value as 'decisor' | 'influenciador')}
+                className="glass-input text-xs py-2.5 w-36 flex-shrink-0"
+              >
+                <option value="decisor">Decisor</option>
+                <option value="influenciador">Influenciador</option>
+              </select>
               {project.stakeholders.length > 1 && (
                 <button
                   onClick={() => removeStakeholder(i)}
