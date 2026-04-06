@@ -128,7 +128,7 @@ export function HandoffWizardPage() {
     }
   }, [recordingUrl]);
 
-  const canProceedStep1 = transcript.trim().length > 50 && linkValid === true;
+  const canProceedStep1 = transcript.trim().length > 50;
 
   // ─── Step 2: Project validation ───────────────────────────────────────────
 

@@ -107,9 +107,9 @@ export const updateHandoffStep = asyncHandler(async (req: Request, res: Response
     updated = await updateStep2(id, {
       company_name: (body.company_name as string) ?? '',
       razao_social: (body.razao_social as string) ?? '',
-      stakeholders: (body.stakeholders as string[]) ?? [],
-      project_start_date: (body.project_start_date as string) ?? '',
-      project_scope: body.project_scope ?? [],
+      stakeholders: (body.stakeholders as string[] ?? body.stakeholder_names as string[]) ?? [],
+      project_start_date: (body.project_start_date as string ?? body.start_date as string) ?? '',
+      project_scope: body.project_scope ?? body.services_scope ?? [],
       contract_url: (body.contract_url as string) ?? '',
       whatsapp_group_id: (body.whatsapp_group_id as string) ?? '',
     });
@@ -240,6 +240,15 @@ export const forwardToCoordinator = asyncHandler(async (req: Request, res: Respo
 
   const handoff = await findById(id);
   if (!handoff) { res.status(404).json({ error: 'Not Found' }); return; }
+
+  // Block forward unless ALL leaders have approved
+  if (handoff.status !== 'approved_all') {
+    res.status(400).json({
+      error: 'Bad Request',
+      message: 'Todos os líderes precisam aprovar antes de encaminhar para o coordenador.',
+    });
+    return;
+  }
 
   const updated = await updateForwarding(id, coordinator_id, user.userId);
 

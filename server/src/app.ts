@@ -15,7 +15,10 @@ app.use(helmet());
 app.use(
   cors({
     origin: process.env.NODE_ENV === 'production'
-      ? process.env.ALLOWED_ORIGINS?.split(',') ?? []
+      ? [
+          ...(process.env.ALLOWED_ORIGINS?.split(',') ?? []),
+          'https://ai-sici.pages.dev',
+        ]
       : ['http://localhost:5173', 'http://localhost:3000'],
     credentials: true,
   })

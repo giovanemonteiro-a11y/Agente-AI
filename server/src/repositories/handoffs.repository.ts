@@ -123,13 +123,14 @@ export async function updateStep2(
 ): Promise<HandoffRow | null> {
   const result = await query<HandoffRow>(
     `UPDATE handoffs
-     SET company_name = $1, razao_social = $2, stakeholders = $3::jsonb,
+     SET company_name = $1, razao_social = $2, stakeholders = $3,
          project_start_date = $4, project_scope = $5, contract_url = $6,
          whatsapp_group_id = $7, current_step = GREATEST(current_step, 2), updated_at = NOW()
      WHERE id = $8 RETURNING *`,
     [
       data.company_name, data.razao_social,
-      JSON.stringify(data.stakeholders), data.project_start_date,
+      Array.isArray(data.stakeholders) ? data.stakeholders : [],
+      data.project_start_date,
       JSON.stringify(data.project_scope), data.contract_url,
       data.whatsapp_group_id, id,
     ]
