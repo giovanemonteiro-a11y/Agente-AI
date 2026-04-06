@@ -6,27 +6,27 @@
 INSERT INTO users (name, email, password_hash, role, must_reset_password) VALUES ('PXP Connection', 'pxpconnection@gmail.com', '$2a$12$3euZQWYZWil2Jje/slq94uyVLy/Yqkk3QdOZSbT4aFYa9An5gp3Hm', 'super_admin', false) ON CONFLICT (email) DO NOTHING;
 
 -- Liderança
-INSERT INTO users (name, email, password_hash, role, must_reset_password) VALUES ('Bruno Henrique', 'bruno.ribeiro@v4company.com', '$2a$12$Ss8WFGC6rLR5AVpiaeymV.OQYRoc0cKDQuFyf8kyfPPw3LAfUnkgG', 'lideranca', true) ON CONFLICT (email) DO NOTHING;
-INSERT INTO users (name, email, password_hash, role, must_reset_password) VALUES ('Bruna Moreira', 'bruna.moreira@v4company.com', '$2a$12$9ozmTq8zWkrL10v5jHpqI.5ifETBkvAI0wJb1UIpcLNnFcVliJYDu', 'lideranca', true) ON CONFLICT (email) DO NOTHING;
-INSERT INTO users (name, email, password_hash, role, must_reset_password) VALUES ('Gerson Ferreira', 'gerson.ferreira@v4company.com', '$2a$12$UcrpVZLafViJiyjlUrBovekfuVEVHQdaeHWprjfBEAaljhalBtHs2', 'lideranca', true) ON CONFLICT (email) DO NOTHING;
+INSERT INTO users (name, email, password_hash, role, must_reset_password) VALUES ('Bruno Henrique', 'bruno.ribeiro@v4company.com', '$2a$12$XoYZM0MbSTLzDenRcMeVAu0BKqkYZiVIRIvirHOHZQ7wcSEtRDcN6', 'lideranca', true) ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, must_reset_password = true;
+INSERT INTO users (name, email, password_hash, role, must_reset_password) VALUES ('Bruna Moreira', 'bruna.moreira@v4company.com', '$2a$12$9S1JZItx8XswgThcvMIu9eI58O73mBIN1SOwrflaHwQIMRjDN9Yta', 'lideranca', true) ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, must_reset_password = true;
+INSERT INTO users (name, email, password_hash, role, must_reset_password) VALUES ('Gerson Ferreira', 'gerson.ferreira@v4company.com', '$2a$12$U8Bbs27.A1NoePQ4Wb4hwOU1bQWqurs1KpEcLwN54L2TMxubNjbX.', 'lideranca', true) ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, must_reset_password = true;
 
 -- Aquisição
-INSERT INTO users (name, email, password_hash, role, must_reset_password) VALUES ('Sandro Notari', 'sandro.notari@v4company.com', '$2a$12$u6pHSeE3EieSUzV6qirx1eEII4.KSeLpitkFXz469O0JJjBF4Ipg.', 'aquisicao', true) ON CONFLICT (email) DO NOTHING;
+INSERT INTO users (name, email, password_hash, role, must_reset_password) VALUES ('Sandro Notari', 'sandro.notari@v4company.com', '$2a$12$MKcQIOvV0zSe0e.0DIDbYu0PiBEbv20k32qJfAY01XdwDdJXkge0u', 'aquisicao', true) ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, must_reset_password = true;
 
 -- Coordenadora
-INSERT INTO users (name, email, password_hash, role, must_reset_password) VALUES ('Ester Prudêncio', 'ester.prudencio@v4company.com', '$2a$12$bAf2hPP58pRbZ0wanFyvXOGqswvLhNLTfgacoVLtvXzDsmQz1NnoC', 'coordenador', true) ON CONFLICT (email) DO NOTHING;
+INSERT INTO users (name, email, password_hash, role, must_reset_password) VALUES ('Ester Prudêncio', 'ester.prudencio@v4company.com', '$2a$12$UgxM9Wk3.KBGo1F/TSe/cOVReX4zsaUjns0pODK3GetfkO4TM9592', 'coordenador', true) ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, must_reset_password = true;
 
 -- Accounts
-INSERT INTO users (name, email, password_hash, role, must_reset_password) VALUES ('Miriam Ozores', 'mirian.ozores@v4company.com', '$2a$12$zqAXXM6BCmkdozvScZVrm.dR67LK/Wnb6CQwJcozbB2LbHbL832vW', 'account', true) ON CONFLICT (email) DO NOTHING;
-INSERT INTO users (name, email, password_hash, role, must_reset_password) VALUES ('Jéssica Pitel', 'jessica.pitel@v4company.com', '$2a$12$k8nxTB4ijkuKctGBjxsn1.vBLIkzuETJJXPxVjtvOKFRlK3NgZqFK', 'account', true) ON CONFLICT (email) DO NOTHING;
+INSERT INTO users (name, email, password_hash, role, must_reset_password) VALUES ('Miriam Ozores', 'mirian.ozores@v4company.com', '$2a$12$4MtBgYAWQHJ8wRpb./2/2ueUS2Ox9APdW5mjJOUvfWlXJrr2jeYyi', 'account', true) ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, must_reset_password = true;
+INSERT INTO users (name, email, password_hash, role, must_reset_password) VALUES ('Jéssica Pitel', 'jessica.pitel@v4company.com', '$2a$12$5VaOufL6.vjvWJYXKKDQ0OxPRnB4YYniFUKjngfFs/27caPxMiCL2', 'account', true) ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, must_reset_password = true;
 
 -- Designers
-INSERT INTO users (name, email, password_hash, role, must_reset_password) VALUES ('Giovane Monteiro', 'giovane.monteiro@v4company.com', '$2a$12$GF5FOpxbvfc84qMdXXo2K.lfqb2eiVkvpnt2bHpAG52Qs3dxZrkd.', 'designer', true) ON CONFLICT (email) DO NOTHING;
-INSERT INTO users (name, email, password_hash, role, must_reset_password) VALUES ('Melissa Bernardes', 'melissa.bernardes@v4company.com', '$2a$12$LSUWccUHbJXcB5xcYUPlU.xogYBxc.LNvdWshtT0Fq96XvZJtYvMa', 'designer', true) ON CONFLICT (email) DO NOTHING;
+INSERT INTO users (name, email, password_hash, role, must_reset_password) VALUES ('Giovane Monteiro', 'giovane.monteiro@v4company.com', '$2a$12$/QPxDvtpSizQaEIMa5P6Xe17CJpyRWrnZuGKzDmYlhy.p.bpQjN.S', 'designer', true) ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, must_reset_password = true;
+INSERT INTO users (name, email, password_hash, role, must_reset_password) VALUES ('Melissa Bernardes', 'melissa.bernardes@v4company.com', '$2a$12$FPs/z6H2e.JPbRtTNDXbDOB2RIHqvqxa5QaOoLwTblwQzFBj4BXPe', 'designer', true) ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, must_reset_password = true;
 
 -- Gestores de Tráfego
-INSERT INTO users (name, email, password_hash, role, must_reset_password) VALUES ('Anderson Areão', 'anderson.areao@v4company.com', '$2a$12$8cV3XpPJ14WaciAm5SCpT.EpxCTYeM/Va9UQR7NxXukbj.fY5BoZ2', 'gestor_trafego', true) ON CONFLICT (email) DO NOTHING;
-INSERT INTO users (name, email, password_hash, role, must_reset_password) VALUES ('Gabriel Pimenta', 'gabriel.pimenta@v4company.com', '$2a$12$1Tl9eoEwWo0QX9QYq9qG0uRROjKM1aZj6oYm7WA4j7q5K3aUutvWW', 'gestor_trafego', true) ON CONFLICT (email) DO NOTHING;
+INSERT INTO users (name, email, password_hash, role, must_reset_password) VALUES ('Anderson Areão', 'anderson.areao@v4company.com', '$2a$12$xcCPfskhcitXbQ4huoZ.NeIDk4oTyFVi8r5t/yBALBFRFva2ee0ou', 'gestor_trafego', true) ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, must_reset_password = true;
+INSERT INTO users (name, email, password_hash, role, must_reset_password) VALUES ('Gabriel Pimenta', 'gabriel.pimenta@v4company.com', '$2a$12$ay6iwQjofmYHerdWr6kEs.AeIAX8DXeHNL5lKiHnzwItP6UufshWG', 'gestor_trafego', true) ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, must_reset_password = true;
 
 -- Tech CRM
-INSERT INTO users (name, email, password_hash, role, must_reset_password) VALUES ('João Pereira', 'joao.pereira@v4company.com', '$2a$12$f6vTk0rDlGYw/nZOqitVDue4O9F5DTuWc4AZhfs0cWf4e3s7J9Lj.', 'tech_crm', true) ON CONFLICT (email) DO NOTHING;
+INSERT INTO users (name, email, password_hash, role, must_reset_password) VALUES ('João Pereira', 'joao.pereira@v4company.com', '$2a$12$mDsXniJZED6khhof9qSUaeuuu4.8.Ti62xYSrL3hCFmM9EvTqouJq', 'tech_crm', true) ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, must_reset_password = true;
