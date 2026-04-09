@@ -1088,7 +1088,7 @@ function Step4Relatorio({
         <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-xs">
           <div><span className="text-text-muted">Empresa:</span> <span className="text-text-primary font-medium">{project.companyName}</span></div>
           <div><span className="text-text-muted">Razão Social:</span> <span className="text-text-primary font-medium">{project.razaoSocial}</span></div>
-          <div><span className="text-text-muted">Stakeholders:</span> <span className="text-text-primary font-medium">{project.stakeholders.join(', ')}</span></div>
+          <div><span className="text-text-muted">Stakeholders:</span> <span className="text-text-primary font-medium">{project.stakeholders.map(s => typeof s === 'string' ? s : s.name).join(', ')}</span></div>
           <div><span className="text-text-muted">Início:</span> <span className="text-text-primary font-medium">{project.projectStartDate}</span></div>
           <div className="col-span-2"><span className="text-text-muted">Escopo:</span> <span className="text-text-primary font-medium">{project.projectScope.join(', ')}</span></div>
         </div>

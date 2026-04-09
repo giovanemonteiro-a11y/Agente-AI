@@ -289,7 +289,12 @@ function mapApiToHandoff(raw: Record<string, unknown>): HandoffItem {
       approvedAt: a.approved_at as string,
     })),
     totalLeaders: 3, // Will be updated dynamically
-    stakeholderName: ((raw.stakeholders as string[]) ?? [])[0] ?? '',
+    stakeholderName: (() => {
+      const stk = raw.stakeholders ?? [];
+      if (!Array.isArray(stk) || stk.length === 0) return '';
+      const first = stk[0];
+      return typeof first === 'string' ? first : (first as { name?: string }).name ?? '';
+    })(),
     razaoSocial: raw.razao_social as string,
     cnpj: '',
     transcript: raw.transcript as string,
