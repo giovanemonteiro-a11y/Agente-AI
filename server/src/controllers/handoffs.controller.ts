@@ -22,6 +22,18 @@ import { findUsersByRole } from '../repositories/users.repository';
 import { logger } from '../utils/logger';
 import { extractProjectFromTranscript } from '../services/ai/ai.service';
 
+// ── Normalize stakeholders for backward-compatible frontend ──────────────────
+// Frontend CRMPage expects stakeholders as string[], but DB stores {name, role}[] objects.
+// This normalizes both formats so either frontend version works.
+function normalizeHandoff(h: Record<string, unknown>): Record<string, unknown> {
+  if (Array.isArray(h.stakeholders)) {
+    h.stakeholders = h.stakeholders.map((s: unknown) =>
+      typeof s === 'string' ? s : (s as { name?: string }).name ?? ''
+    );
+  }
+  return h;
+}
+
 // ── POST /api/handoffs/extract-transcript ────────────────────────────────────
 
 export const extractTranscript = asyncHandler(async (req: Request, res: Response): Promise<void> => {
@@ -57,7 +69,7 @@ export const createHandoff = asyncHandler(async (req: Request, res: Response): P
 export const getHandoff = asyncHandler(async (req: Request, res: Response): Promise<void> => {
   const handoff = await findById(req.params.id);
   if (!handoff) { res.status(404).json({ error: 'Not Found' }); return; }
-  res.status(200).json({ data: handoff });
+  res.status(200).json({ data: normalizeHandoff(handoff as unknown as Record<string, unknown>) });
 });
 
 // ── GET /api/handoffs/my ─────────────────────────────────────────────────────
@@ -66,14 +78,14 @@ export const getMyHandoffs = asyncHandler(async (req: Request, res: Response): P
   const user = req.user;
   if (!user) { res.status(401).json({ error: 'Unauthorized' }); return; }
   const handoffs = await findByCreatedBy(user.userId);
-  res.status(200).json({ data: handoffs });
+  res.status(200).json({ data: handoffs.map(h => normalizeHandoff(h as unknown as Record<string, unknown>)) });
 });
 
 // ── GET /api/handoffs/leadership ─────────────────────────────────────────────
 
 export const getLeadershipHandoffs = asyncHandler(async (_req: Request, res: Response): Promise<void> => {
   const handoffs = await findForLeadership();
-  res.status(200).json({ data: handoffs });
+  res.status(200).json({ data: handoffs.map(h => normalizeHandoff(h as unknown as Record<string, unknown>)) });
 });
 
 // ── GET /api/handoffs/coordinator ────────────────────────────────────────────
@@ -82,7 +94,7 @@ export const getCoordinatorHandoffs = asyncHandler(async (req: Request, res: Res
   const user = req.user;
   if (!user) { res.status(401).json({ error: 'Unauthorized' }); return; }
   const handoffs = await findForCoordinator(user.userId);
-  res.status(200).json({ data: handoffs });
+  res.status(200).json({ data: handoffs.map(h => normalizeHandoff(h as unknown as Record<string, unknown>)) });
 });
 
 // ── PATCH /api/handoffs/:id/step/:step ───────────────────────────────────────
