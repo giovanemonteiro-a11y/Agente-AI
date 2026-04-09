@@ -2,8 +2,8 @@ import { getVaultPath, getClientVaultFolders, PORTFOLIO_FOLDER } from './vault-s
 import { renderToMarkdown } from './markdown-templates';
 import { logger } from '../../utils/logger';
 
-// Will be extended in drive.service.ts
-import { uploadFileToDrive, createClientFolder } from '../drive.service';
+// Drive integration will be used for vault sync in Phase 0.6
+// import { uploadFileToDrive, createClientFolder } from '../drive.service';
 
 export interface VaultDocument {
   clientName: string;

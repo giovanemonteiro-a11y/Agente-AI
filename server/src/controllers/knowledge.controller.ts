@@ -7,8 +7,6 @@ import {
   upsert,
 } from '../repositories/knowledge.repository';
 import { renderVaultDocument } from '../services/vault/vault.service';
-import { getVaultPath } from '../services/vault/vault-structure';
-import { generateWithGemini } from '../services/ai/gemini.service';
 import { logger } from '../utils/logger';
 
 // ── GET /api/knowledge/:clientId ────────────────────────────────────────────
