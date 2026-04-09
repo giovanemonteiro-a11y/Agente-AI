@@ -46,15 +46,15 @@ BEGIN
         ', '
       ) FROM jsonb_array_elements(
         CASE
-          WHEN v_handoff.project_scope IS NOT NULL AND jsonb_typeof(v_handoff.project_scope::jsonb) = 'array'
-            THEN v_handoff.project_scope::jsonb
+          WHEN v_handoff.project_scope IS NOT NULL AND jsonb_typeof(v_handoff.project_scope) = 'array'
+            THEN v_handoff.project_scope
           ELSE '[]'::jsonb
         END
       ) AS elem),
       'serviços de marketing digital'
     );
 
-    v_start_date := COALESCE(v_handoff.project_start_date, 'A definir');
+    v_start_date := COALESCE(v_handoff.project_start_date::TEXT, 'A definir');
 
     -- Generate SPICED report if missing
     IF v_handoff.spiced_report IS NULL THEN
