@@ -19,6 +19,7 @@ import coordinatorClientRoutes from './coordinator-clients.routes';
 import trioRoutes from './trios.routes';
 import sprintSystemRoutes from './sprint.routes';
 import commercialRoutes from './commercial.routes';
+import knowledgeRoutes from './knowledge.routes';
 
 export const router = Router();
 
@@ -42,3 +43,4 @@ router.use('/coordinator/clients', coordinatorClientRoutes);
 router.use('/trios', trioRoutes);
 router.use('/sprint', sprintSystemRoutes);
 router.use('/commercial', commercialRoutes);
+router.use('/knowledge', knowledgeRoutes);

@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@google-cloud/local-auth": "^3.0.1",
+    "@google/generative-ai": "^0.24.1",
     "bcryptjs": "^2.4.3",
     "bull": "^4.12.2",
     "cors": "^2.8.5",
