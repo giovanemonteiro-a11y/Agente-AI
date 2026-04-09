@@ -4,6 +4,7 @@ import {
   listClientKnowledge,
   getKnowledgeDoc,
   generateKnowledgeDoc,
+  generateAllKnowledgeDocs,
   syncClientVault,
 } from '../controllers/knowledge.controller';
 
@@ -14,6 +15,7 @@ router.use(authenticate);
 router.get('/:clientId', listClientKnowledge);
 router.get('/:clientId/:docType', getKnowledgeDoc);
 router.post('/:clientId/generate/:docType', generateKnowledgeDoc);
+router.post('/:clientId/generate-all', generateAllKnowledgeDocs);
 router.post('/:clientId/sync', syncClientVault);
 
 export default router;

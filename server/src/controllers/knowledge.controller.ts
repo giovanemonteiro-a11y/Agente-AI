@@ -4,9 +4,12 @@ import { AppError } from '../middleware/errorHandler';
 import {
   findByClientId,
   findByClientAndType,
-  upsert,
 } from '../repositories/knowledge.repository';
-import { renderVaultDocument } from '../services/vault/vault.service';
+import {
+  generateDocument,
+  generateAllDocuments,
+  GENERABLE_DOC_TYPES,
+} from '../services/knowledge/knowledge-generator.service';
 import { logger } from '../utils/logger';
 
 // ── GET /api/knowledge/:clientId ────────────────────────────────────────────
@@ -31,33 +34,34 @@ export const getKnowledgeDoc = asyncHandler(async (req: Request, res: Response):
 export const generateKnowledgeDoc = asyncHandler(async (req: Request, res: Response): Promise<void> => {
   const { clientId, docType } = req.params;
 
+  if (!GENERABLE_DOC_TYPES.includes(docType)) {
+    throw new AppError(`Invalid doc type: ${docType}. Valid types: ${GENERABLE_DOC_TYPES.join(', ')}`, 400);
+  }
+
   logger.info(`Generating knowledge doc: ${docType} for client ${clientId}`);
 
-  // For now, generate a placeholder — will be replaced by full knowledge-generator in Phase 1
-  const clientName = (req.body.clientName as string) ?? 'Cliente';
-  const placeholderData: Record<string, unknown> = {
-    overview: `Documento ${docType} gerado automaticamente para ${clientName}.`,
-    generatedAt: new Date().toISOString(),
-    status: 'placeholder — Fase 1 implementara geracao completa via AI',
-  };
+  const result = await generateDocument(clientId, docType);
 
-  const { markdown, vaultPath } = renderVaultDocument({
-    clientName,
-    docType,
-    data: placeholderData,
+  const saved = await findByClientAndType(clientId, docType);
+  res.status(201).json({ data: saved, generation: result });
+});
+
+// ── POST /api/knowledge/:clientId/generate-all ──────────────────────────────
+
+export const generateAllKnowledgeDocs = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+  const { clientId } = req.params;
+
+  logger.info(`Generating ALL knowledge docs for client ${clientId}`);
+
+  const results = await generateAllDocuments(clientId);
+
+  const success = results.filter(r => !r.error).length;
+  const failed = results.filter(r => r.error).length;
+
+  res.status(201).json({
+    message: `Generated ${success}/${GENERABLE_DOC_TYPES.length} documents (${failed} failed)`,
+    results,
   });
-
-  const saved = await upsert({
-    client_id: clientId,
-    doc_type: docType,
-    title: `${docType.replace(/_/g, ' ')} — ${clientName}`,
-    content_md: markdown,
-    content_json: placeholderData,
-    vault_path: vaultPath,
-    generated_by: 'groq',
-  });
-
-  res.status(201).json({ data: saved });
 });
 
 // ── POST /api/knowledge/:clientId/sync ──────────────────────────────────────
@@ -68,7 +72,7 @@ export const syncClientVault = asyncHandler(async (req: Request, res: Response):
   const docs = await findByClientId(clientId);
   logger.info(`Syncing ${docs.length} docs to vault for client ${clientId}`);
 
-  // TODO: Phase 0.6 — implement actual Drive sync via vault.service.ts
+  // TODO: implement actual Drive sync via vault.service.ts
   res.status(200).json({
     message: `Vault sync queued for ${docs.length} documents`,
     documents: docs.map(d => ({ docType: d.doc_type, vaultPath: d.vault_path })),
