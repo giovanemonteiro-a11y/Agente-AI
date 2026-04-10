@@ -54,3 +54,6 @@ router.use('/whatsapp-connect', baileysRoutes);
 
 import dashboardRoutes from './dashboard.routes';
 router.use('/dashboard', dashboardRoutes);
+
+import hypothesesRoutes from './hypotheses.routes';
+router.use('/hypotheses', hypothesesRoutes);
