@@ -48,3 +48,6 @@ router.use('/commercial', commercialRoutes);
 router.use('/knowledge', knowledgeRoutes);
 router.use('/', evolutionRoutes);  // /api/evolution/* + /api/webhooks/evolution
 router.use('/demands', demandsRoutes);
+
+import baileysRoutes from './baileys.routes';
+router.use('/whatsapp-connect', baileysRoutes);
